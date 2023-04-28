@@ -1,20 +1,16 @@
-import typer
+import hydra
 
+from conf import Config
 from utils import get_logger
 
-app = typer.Typer()
 logger = get_logger(__name__)
 
 
-@app.command()
-def tuner():
-    logger.info("Running Tuner")
-
-
-@app.command()
-def trainer():
-    logger.info("Running Trainer")
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def main(cfg: Config):
+    logger = get_logger(__name__)
+    logger.info("Running RLGymBoost with configuration: " + str(cfg))
 
 
 if __name__ == "__main__":
-    app()
+    main()

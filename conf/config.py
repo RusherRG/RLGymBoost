@@ -1,6 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from hydra.core.config_store import ConfigStore
+
+from conf.mode import TrainerConfig, TunerConfig
 
 
 @dataclass
@@ -10,11 +12,15 @@ class Config:
     # gym
     gym_name: str = ""
 
+    # modes
+    tuner: TunerConfig = field(default_factory=TunerConfig)
+    trainer: TrainerConfig = field(default_factory=TrainerConfig)
+
     # run
     exp_name: str = ""
     overwrite: bool = False # Overwrite the output directory if it exists
-    seed: int = 123
-    epochs: int = 100       # number of epochs to run for each algorithm
+    seed: int = 42
+
 
 cs = ConfigStore.instance()
-cs.store(name="base_config", node=Config)
+cs.store(name="default_config", node=Config)

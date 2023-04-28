@@ -1,14 +1,17 @@
-defaults:
-  # Defaults are applied in the order they appear, so later defaults override earlier ones.
-
-  - base_config # Defaults defined in `Config` from `config.py`
-  - _self_ # Defaults defined below
-
 # gym
-gym_name: ""
+gym_name: CarRacing-v1
 
 # run
-exp_name: "tuner"
-overwrite: false
+exp_name: gymnasium_car_racing
+overwrite: False
 seed: 123
-epochs: 100
+
+# tuner
+tuner:
+  run: true
+  epochs: 25
+
+# trainer
+trainer:
+  run: true
+  epochs: 100
