@@ -1,7 +1,8 @@
 from ray.rllib.algorithms.ppo import PPOConfig
 from ray.tune.logger import pretty_print
 
-class Train():
+
+class Train:
     def train(self, epochs=10):
         algo = (
             PPOConfig()
