@@ -11,7 +11,7 @@ import pprint
 
 
 class Train:
-    def train(self, epochs=5):
+    def train(self, epochs=20):
         # Configure algorithm
         config = (
             DQNConfig()
@@ -46,6 +46,9 @@ class Train:
 
         results = algo.evaluate()
         self.print_metrics(results["evaluation"])
+
+        checkpoint_dir = algo.save()
+        print(f"\nCheckpoint saved in directory {checkpoint_dir}")
 
     def print_metrics(self, results):
         metrics_to_print = [
