@@ -11,6 +11,7 @@ class Config:
 
     # gym
     gym_name: str = ""
+    render_freq: int = 10   # frequency of environment render
 
     # modes
     tuner: TunerConfig = field(default_factory=TunerConfig)
@@ -20,6 +21,7 @@ class Config:
     exp_name: str = ""
     overwrite: bool = False # Overwrite the output directory if it exists
     seed: int = 42
+    
 
 
 cs = ConfigStore.instance()

@@ -1,5 +1,5 @@
 # gym
-gym_name: CarRacing-v1
+gym_name: MountainCar-v0
 
 # run
 exp_name: gymnasium_car_racing
@@ -10,6 +10,9 @@ seed: 123
 tuner:
   run: true
   epochs: 25
+  num_workers: 4
+  num_cpus: 2
+  num_gpus: 1
 
 # trainer
 trainer:

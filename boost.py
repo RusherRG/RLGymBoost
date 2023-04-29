@@ -1,7 +1,9 @@
 import hydra
 
 from conf import Config
+from tuner import Tuner
 from utils import get_logger
+from validator import validate_gym_environment
 
 logger = get_logger(__name__)
 
@@ -10,6 +12,13 @@ logger = get_logger(__name__)
 def main(cfg: Config):
     logger = get_logger(__name__)
     logger.info("Running RLGymBoost with configuration: " + str(cfg))
+
+    if not validate_gym_environment(cfg.gym_name, cfg.seed):
+        exit(0)
+
+    if cfg.tuner.run:
+        tuner = Tuner(gym_name=cfg.gym_name)
+        tuner.run()
 
 
 if __name__ == "__main__":
