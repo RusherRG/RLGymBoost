@@ -2,6 +2,7 @@ import hydra
 
 from conf import Config
 from tuner import Tuner
+from trainer import Trainer
 from utils import get_logger
 from validator import validate_gym_environment
 
@@ -19,6 +20,10 @@ def main(cfg: Config):
     if cfg.tuner.run:
         tuner = Tuner(gym_name=cfg.gym_name)
         tuner.run()
+
+    if cfg.trainer.run:
+        trainer = Trainer(gym_name=cfg.gym_name)
+        trainer.run()
 
 
 if __name__ == "__main__":
