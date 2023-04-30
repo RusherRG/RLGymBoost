@@ -18,17 +18,21 @@ class Train:
         trainer = RLTrainer(
             run_config=RunConfig(stop={"training_iteration": epochs}),
             scaling_config=ScalingConfig(num_workers=2, use_gpu=True),
-            algorithm="DQN",
+            algorithm="PPO",
             config={
+                # environment
                 "env": "CartPole-v1",
+                # rollouts
+                # framework
                 "framework": "torch",
+
                 "evaluation_num_workers": 1,
                 "evaluation_interval": 1,
                 "evaluation_config": {"input": "sampler"},
                 "num_rollout_workers": 2,
                 "num_envs_per_worker": 1,
                 "model": {"fcnet_hiddens": [64, 64]},
-                "train_batch_size": 32,
+                "train_batch_size": 1000,
                 "lr": 1e-4,
             },
         )
