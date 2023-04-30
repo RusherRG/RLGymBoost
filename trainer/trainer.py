@@ -15,12 +15,15 @@ from ray.train.rl import RLTrainer
 import os
 
 
-class Train:
-    def train(self, algorithm="PPO", epochs=5):
+class Trainer:
+    def __init__(self, gym_name: str = 'PPO'):
+        self.gym_name = gym_name
+
+    def run(self, epochs: int = 5):
         trainer = RLTrainer(
             run_config=RunConfig(stop={"training_iteration": epochs}),
             scaling_config=ScalingConfig(num_workers=2, use_gpu=True),
-            algorithm=algorithm,
+            algorithm=self.gym_name,
             config={
                 # environment
                 "env": "CartPole-v1",
@@ -47,7 +50,7 @@ class Train:
         result = trainer.fit()
         self.print_metrics(result.metrics)
 
-        self.save_checkpoint(algorithm, epochs, trainer)
+        self.save_checkpoint(epochs, trainer)
 
     def print_metrics(self, results):
         metrics_to_print = [
@@ -59,8 +62,8 @@ class Train:
 
         pprint.pprint({k: v for k, v in results.items() if k in metrics_to_print})
 
-    def save_checkpoint(self, algorithm, epochs, trainer):
-        checkpoint_dir = f"checkpoint/{algorithm}/"
+    def save_checkpoint(self, epochs: int, trainer: RLTrainer):
+        checkpoint_dir = f"checkpoint/{self.gym_name}/"
 
         os.makedirs(os.path.dirname(checkpoint_dir), exist_ok=True)
 
