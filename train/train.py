@@ -9,9 +9,34 @@ from ray.rllib.algorithms.bc.bc import BC
 
 import pprint
 
+from ray.air.config import RunConfig, ScalingConfig
+from ray.train.rl import RLTrainer
+
 
 class Train:
-    def train(self, epochs=5):
+    def train(self, epochs=50):
+        trainer = RLTrainer(
+            run_config=RunConfig(stop={"training_iteration": epochs}),
+            scaling_config=ScalingConfig(num_workers=2, use_gpu=True),
+            algorithm="DQN",
+            config={
+                "env": "CartPole-v1",
+                "framework": "torch",
+                "evaluation_num_workers": 1,
+                "evaluation_interval": 1,
+                "evaluation_config": {"input": "sampler"},
+                "num_rollout_workers": 2,
+                "num_envs_per_worker": 1,
+                "model": {"fcnet_hiddens": [64, 64]},
+                "train_batch_size": 32,
+                "lr": 1e-4,
+            },
+        )
+        result = trainer.fit()
+        # pprint.pprint(result)
+        self.print_metrics(result.metrics)
+
+    def train_old(self, epochs=50):
         # Configure algorithm
         config = (
             DQNConfig()
