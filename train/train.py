@@ -22,61 +22,30 @@ class Train:
             config={
                 # environment
                 "env": "CartPole-v1",
+                "observation_space": None,
+                "action_space": None,
                 # rollouts
-                # framework
-                "framework": "torch",
-
-                "evaluation_num_workers": 1,
-                "evaluation_interval": 1,
-                "evaluation_config": {"input": "sampler"},
                 "num_rollout_workers": 2,
                 "num_envs_per_worker": 1,
+                # framework
+                "framework": "torch",
+                # resources
+                "num_gpus": 1,
+                # training
                 "model": {"fcnet_hiddens": [64, 64]},
                 "train_batch_size": 1000,
                 "lr": 1e-4,
+                "gamma": 0.99,
+                # evaluation
+                "evaluation_num_workers": 1,
+                "evaluation_interval": 1,
+                "evaluation_config": {"input": "sampler"},
             },
         )
         result = trainer.fit()
-        # pprint.pprint(result)
         self.print_metrics(result.metrics)
 
-    def train_old(self, epochs=50):
-        # Configure algorithm
-        config = (
-            DQNConfig()
-            .environment(
-                env="CartPole-v1",
-                observation_space=None,
-                action_space=None,
-            )
-            .rollouts(
-                num_rollout_workers=2,
-                num_envs_per_worker=1,
-            )
-            .framework("torch")
-            .resources(
-                num_gpus=1,
-            )
-            .training(
-                model={"fcnet_hiddens": [64, 64]},
-                train_batch_size=32,
-                lr=1e-4,
-            )
-            .evaluation(evaluation_num_workers=1, evaluation_interval=1)
-        )
-
-        # build algorithm
-        algo = config.build()
-
-        # train algorithm
-        for i in range(epochs):
-            results = algo.train()
-            self.print_metrics(results)
-
-        results = algo.evaluate()
-        self.print_metrics(results["evaluation"])
-
-        checkpoint_dir = algo.save("checkpoint/")
+        checkpoint_dir = trainer.save("checkpoint/")
         print(f"\nCheckpoint saved in directory {checkpoint_dir}")
 
     def print_metrics(self, results):
