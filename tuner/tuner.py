@@ -8,7 +8,6 @@ class Tuner:
     def __init__(self, gym_name: str):
         self.gym_name = gym_name
 
-
     # Postprocess the perturbed config to ensure it's still valid
     def explore(self, config):
         # ensure we collect enough timesteps to do sgd
@@ -47,7 +46,7 @@ class Tuner:
                 metric="episode_reward_mean",
                 mode="max",
                 scheduler=pbt,
-                num_samples=1, 
+                num_samples=1,
                 # if args.smoke_test else 2,
             ),
             param_space={

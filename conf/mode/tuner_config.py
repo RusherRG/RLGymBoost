@@ -11,4 +11,3 @@ class TunerConfig:
     num_workers: int = 4
     num_cpus: int = 1  # number of CPUs to use per trial
     num_gpus: int = 1  # number of GPUs to use per trial
-
