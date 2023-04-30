@@ -12,13 +12,15 @@ import pprint
 from ray.air.config import RunConfig, ScalingConfig
 from ray.train.rl import RLTrainer
 
+import os
+
 
 class Train:
-    def train(self, epochs=50):
+    def train(self, algorithm="PPO", epochs=5):
         trainer = RLTrainer(
             run_config=RunConfig(stop={"training_iteration": epochs}),
             scaling_config=ScalingConfig(num_workers=2, use_gpu=True),
-            algorithm="PPO",
+            algorithm=algorithm,
             config={
                 # environment
                 "env": "CartPole-v1",
@@ -45,8 +47,7 @@ class Train:
         result = trainer.fit()
         self.print_metrics(result.metrics)
 
-        checkpoint_dir = trainer.save("checkpoint/")
-        print(f"\nCheckpoint saved in directory {checkpoint_dir}")
+        self.save_checkpoint(algorithm, epochs, trainer)
 
     def print_metrics(self, results):
         metrics_to_print = [
@@ -57,3 +58,13 @@ class Train:
         ]
 
         pprint.pprint({k: v for k, v in results.items() if k in metrics_to_print})
+
+    def save_checkpoint(self, algorithm, epochs, trainer):
+        checkpoint_dir = f"checkpoint/{algorithm}/"
+
+        os.makedirs(os.path.dirname(checkpoint_dir), exist_ok=True)
+
+        saver = trainer.as_trainable()
+        saver().save_checkpoint(checkpoint_dir=checkpoint_dir)
+
+        print(f"\nCheckpoint saved in directory {checkpoint_dir}")
