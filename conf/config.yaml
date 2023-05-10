@@ -1,5 +1,5 @@
 # gym
-gym_name: MountainCar-v0
+gym_name: CartPole-v1
 
 # run
 exp_name: gymnasium_car_racing
@@ -9,12 +9,34 @@ seed: 123
 # tuner
 tuner:
   run: true
-  epochs: 25
-  num_workers: 4
-  num_cpus: 2
+
+  # PBT config
+  num_samples: 4
+  time_attr: training_iteration
+  perturbation_interval: 10
+  resample_probability: 0.5
+
+  # tune config
+  metric: episode_reward_mean
+  mode: max
+
+  # resource config
+  num_cpus: 5
   num_gpus: 1
+  num_workers: 4
+
+  # run config
+  stopping_criteria:
+    training_iteration: 50
+    episode_reward_mean: 100
 
 # trainer
 trainer:
   run: true
   epochs: 100
+
+algorithms:
+  - a2c
+  - ddpg
+  - dqn
+  - ppo

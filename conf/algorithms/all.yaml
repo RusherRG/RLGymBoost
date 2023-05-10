@@ -1,0 +1,3 @@
+defaults:
+  - ppo
+  - a2c

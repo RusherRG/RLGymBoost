@@ -1,0 +1,10 @@
+name: DQN
+
+discrete_actions: true
+continuous_actions: false
+multi_agent: true
+multi_gpu: true
+
+hyperparameters:
+  - lr
+  - gamma

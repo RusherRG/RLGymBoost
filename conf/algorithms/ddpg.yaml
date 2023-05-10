@@ -1,0 +1,10 @@
+name: DDPG
+
+discrete_actions: false
+continuous_actions: true
+multi_agent: true
+multi_gpu: true
+
+hyperparameters:
+  - lr
+  - gamma

@@ -2,68 +2,72 @@ import pprint
 import ray
 from ray import air, tune
 from ray.tune.schedulers import PopulationBasedTraining
+from typing import List
+
+from conf.algorithms import AlgorithmConfig
+from conf.mode import TunerConfig
+from utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class Tuner:
-    def __init__(self, gym_name: str):
+    def __init__(self, gym_name: str, config: TunerConfig):
         self.gym_name = gym_name
+        self.config = config
 
-    # Postprocess the perturbed config to ensure it's still valid
-    def explore(self, config):
-        # ensure we collect enough timesteps to do sgd
-        if config["train_batch_size"] < config["sgd_minibatch_size"] * 2:
-            config["train_batch_size"] = config["sgd_minibatch_size"] * 2
-        # ensure we run at least one sgd iter
-        if config["num_sgd_iter"] < 1:
-            config["num_sgd_iter"] = 1
-        return config
-
-    def run(self):
-        hyperparam_mutations = {
-            "lambda": lambda: random.uniform(0.9, 1.0),
-            "clip_param": lambda: random.uniform(0.01, 0.5),
-            "lr": [1e-3, 5e-4, 1e-4, 5e-5, 1e-5],
-            "num_sgd_iter": lambda: random.randint(1, 30),
-            "sgd_minibatch_size": lambda: random.randint(128, 16384),
-            "train_batch_size": lambda: random.randint(2000, 160000),
+    def get_hyperparameter_mutations(self, hyperparameters: List[str]):
+        """
+        Return the hyperparameter mutations based on the hyperparameter search space
+        defined for each hyperparameter
+        """
+        all_mutations = {
+            "lambda": tune.quniform(0.9, 1.0, 0.01),
+            "clip_param": tune.quniform(0.05, 0.5, 0.05),
+            "lr": tune.quniform(5e-3, 1e-1, 5e-3),
+            "kl_coeff": tune.quniform(0.3, 1, 0.1),
+            "gamma": tune.quniform(0.95, 0.99, 0.01),
         }
 
-        pbt = PopulationBasedTraining(
-            time_attr="time_total_s",
-            perturbation_interval=120,
-            resample_probability=0.25,
-            # Specifies the mutations of these hyperparams
-            hyperparam_mutations=hyperparam_mutations,
-            custom_explore_fn=self.explore,
+        mutations = {}
+        for hyperparameter in hyperparameters:
+            if all_mutations.get(hyperparameter):
+                mutations[hyperparameter] = all_mutations.get(hyperparameter)
+        return mutations
+
+    def tune_algorithm(self, algo_config: AlgorithmConfig):
+        """
+        Tune the hyperparameters for an algorithm using Population Based Training Scheduler
+        and ray Tune API. Stopping the tuning when the stopping criteria defined in the
+        algo_config is met.
+        """
+        logger.info(f"Tuning algorithm: {algo_config.name}")
+        hyperparam_mutations = self.get_hyperparameter_mutations(
+            algo_config.hyperparameters
         )
 
-        # Stop when we've either reached 100 training iterations or reward=300
-        stopping_criteria = {"training_iteration": 100, "episode_reward_mean": 300}
+        pbt = PopulationBasedTraining(
+            time_attr=self.config.time_attr,
+            perturbation_interval=self.config.perturbation_interval,
+            resample_probability=self.config.resample_probability,
+            hyperparam_mutations=hyperparam_mutations,
+        )
 
         tuner = tune.Tuner(
-            "DQN",
+            algo_config.name,
             tune_config=tune.TuneConfig(
-                metric="episode_reward_mean",
-                mode="max",
+                metric=self.config.metric,
+                mode=self.config.mode,
                 scheduler=pbt,
-                num_samples=1,
-                # if args.smoke_test else 2,
+                num_samples=self.config.num_samples,
             ),
             param_space={
                 "env": self.gym_name,
-                "kl_coeff": 1.0,
-                "num_workers": 4,
-                "model": {"free_log_std": True},
-                # These params are tuned from a fixed starting value.
-                "lambda": 0.95,
-                "clip_param": 0.2,
-                "lr": 1e-4,
-                # These params start off randomly drawn from a set.
-                "num_sgd_iter": tune.choice([10, 20, 30]),
-                "sgd_minibatch_size": tune.choice([128, 512, 2048]),
-                "train_batch_size": tune.choice([10000, 20000, 40000]),
+                "num_workers": self.config.num_workers,
+                "num_gpus": self.config.num_gpus,
+                "num_cpus": self.config.num_cpus,
             },
-            run_config=air.RunConfig(stop=stopping_criteria),
+            run_config=air.RunConfig(stop=dict(self.config.stopping_criteria)),
         )
         results = tuner.fit()
 
@@ -85,3 +89,18 @@ class Tuner:
         pprint.pprint(
             {k: v for k, v in best_result.metrics.items() if k in metrics_to_print}
         )
+        return best_result
+
+    def run(self, algorithms: List[AlgorithmConfig]):
+        """
+        Runs the Tuner to fine-tune the hyperparameters on each of the algorithms
+        on the given game environment to find the algorithm that has the best reward
+        """
+        logger.info(
+            f"Running Tuner to find the best algorithm: {[algo['name'] for algo in algorithms]}"
+        )
+        results = {}
+        for algo in algorithms:
+            results[algo.name] = self.tune_algorithm(algo)
+
+        return results
