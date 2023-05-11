@@ -2,6 +2,7 @@ import pprint
 import ray
 from ray import air, tune
 from ray.tune.schedulers import PopulationBasedTraining
+from ray.air.integrations.wandb import WandbLoggerCallback
 from typing import List
 
 from conf.algorithms import AlgorithmConfig
@@ -67,7 +68,12 @@ class Tuner:
                 "num_gpus": self.config.num_gpus,
                 "num_cpus": self.config.num_cpus,
             },
-            run_config=air.RunConfig(stop=dict(self.config.stopping_criteria)),
+            run_config=air.RunConfig(
+                stop=dict(self.config.stopping_criteria),
+                callbacks=[
+                    WandbLoggerCallback(project="RLGymBoost", api_key="")
+                ],
+            ),
         )
         results = tuner.fit()
 

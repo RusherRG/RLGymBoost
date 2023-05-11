@@ -9,6 +9,7 @@ from utils import load_algo_config
 
 logger = get_logger(__name__)
 
+
 @hydra.main(version_base=None, config_path="conf", config_name="config.yaml")
 def main(cfg: Config):
     logger = get_logger(__name__)

@@ -1,5 +1,6 @@
 from ray.air.config import RunConfig, ScalingConfig
 from ray.train.rl import RLTrainer
+from ray.air.integrations.wandb import WandbLoggerCallback
 
 import pprint
 import os
@@ -11,7 +12,12 @@ class Trainer:
 
     def run(self, epochs: int = 5):
         trainer = RLTrainer(
-            run_config=RunConfig(stop={"training_iteration": epochs}),
+            run_config=RunConfig(
+                stop={"training_iteration": epochs},
+                callbacks=[
+                    WandbLoggerCallback(project="RLGymBoost", api_key="")
+                ],
+            ),
             scaling_config=ScalingConfig(num_workers=2, use_gpu=True),
             algorithm=self.gym_name,
             config={
