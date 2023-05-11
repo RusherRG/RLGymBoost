@@ -1,13 +1,15 @@
 import hydra
+from dotenv import load_dotenv
+import ray
 
 from conf import Config
-from tuner import Tuner
 from trainer import Trainer
-from utils import get_logger
+from tuner import Tuner
+from utils import get_logger, load_algo_config
 from validator import validate_gym_environment
-from utils import load_algo_config
 
 logger = get_logger(__name__)
+load_dotenv()
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config.yaml")
@@ -19,12 +21,14 @@ def main(cfg: Config):
     if not validate_gym_environment(cfg.gym_name, cfg.seed):
         exit(0)
 
+    ray.init(address="auto", configure_logging=False)
+
     if cfg.tuner.run:
         tuner = Tuner(gym_name=cfg.gym_name, config=cfg.tuner)
         tuner.run(cfg.algorithms)
 
     # if cfg.trainer.run:
-    #     trainer = Trainer(gym_name=cfg.gym_name)
+    #     trainer = Trainer()
     #     trainer.run()
 
 

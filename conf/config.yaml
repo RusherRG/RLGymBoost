@@ -13,21 +13,21 @@ tuner:
   # PBT config
   num_samples: 4
   time_attr: training_iteration
-  perturbation_interval: 10
+  perturbation_interval: 5
   resample_probability: 0.5
 
   # tune config
   metric: episode_reward_mean
   mode: max
 
-  # resource config
-  num_cpus: 5
+  # resource config per worker
+  num_cpus: 3
   num_gpus: 1
   num_workers: 4
 
   # run config
   stopping_criteria:
-    training_iteration: 50
+    training_iteration: 20
     episode_reward_mean: 100
 
 # trainer
@@ -36,7 +36,4 @@ trainer:
   epochs: 100
 
 algorithms:
-  - a2c
-  - ddpg
-  - dqn
   - ppo

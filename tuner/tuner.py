@@ -1,9 +1,11 @@
+import os
 import pprint
+from typing import List
+
 import ray
 from ray import air, tune
-from ray.tune.schedulers import PopulationBasedTraining
 from ray.air.integrations.wandb import WandbLoggerCallback
-from typing import List
+from ray.tune.schedulers import PopulationBasedTraining
 
 from conf.algorithms import AlgorithmConfig
 from conf.mode import TunerConfig
@@ -36,6 +38,27 @@ class Tuner:
                 mutations[hyperparameter] = all_mutations.get(hyperparameter)
         return mutations
 
+    def parse_results(self, results, algo_config: AlgorithmConfig):
+        """
+        Parse the results object to generate the results that could be used by the Trainer
+        """
+
+        best_result = results.get_best_result()
+        best_hyperparameters = {
+            param: best_result.config.get(param, 0)
+            for param in algo_config.hyperparameters
+        }
+        metrics = [
+            "episode_reward_mean",
+            "episode_reward_max",
+            "episode_reward_min",
+            "episode_len_mean",
+        ]
+        best_metrics = {
+            metric: best_result.metrics.get(metric, 0) for metric in metrics
+        }
+        return {"hyperparameters": best_hyperparameters, "metrics": best_metrics}
+
     def tune_algorithm(self, algo_config: AlgorithmConfig):
         """
         Tune the hyperparameters for an algorithm using Population Based Training Scheduler
@@ -52,6 +75,7 @@ class Tuner:
             perturbation_interval=self.config.perturbation_interval,
             resample_probability=self.config.resample_probability,
             hyperparam_mutations=hyperparam_mutations,
+            synch=True,
         )
 
         tuner = tune.Tuner(
@@ -65,37 +89,25 @@ class Tuner:
             param_space={
                 "env": self.gym_name,
                 "num_workers": self.config.num_workers,
-                "num_gpus": self.config.num_gpus,
-                "num_cpus": self.config.num_cpus,
+                "num_gpus_per_worker": self.config.num_gpus,
+                "num_cpus_per_worker": self.config.num_cpus,
             },
             run_config=air.RunConfig(
                 stop=dict(self.config.stopping_criteria),
                 callbacks=[
-                    WandbLoggerCallback(project="RLGymBoost", api_key="")
+                    WandbLoggerCallback(
+                        project="RLGymBoost", api_key=os.getenv("WANDB_API_KEY")
+                    )
                 ],
             ),
         )
-        results = tuner.fit()
-
-        best_result = results.get_best_result()
-
-        print("Best performing trial's final set of hyperparameters:\n")
-        pprint.pprint(
-            {k: v for k, v in best_result.config.items() if k in hyperparam_mutations}
-        )
-
-        print("\nBest performing trial's final reported metrics:\n")
-
-        metrics_to_print = [
-            "episode_reward_mean",
-            "episode_reward_max",
-            "episode_reward_min",
-            "episode_len_mean",
-        ]
-        pprint.pprint(
-            {k: v for k, v in best_result.metrics.items() if k in metrics_to_print}
-        )
-        return best_result
+        try:
+            results = tuner.fit()
+            best_result = self.parse_results(results, algo_config)
+            return best_result
+        except Exception as e:
+            logger.error(e)
+            return {}
 
     def run(self, algorithms: List[AlgorithmConfig]):
         """

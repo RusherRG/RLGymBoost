@@ -10,12 +10,12 @@ class Trainer:
     def __init__(self, gym_name: str = "PPO"):
         self.gym_name = gym_name
 
-    def run(self, epochs: int = 5):
+    def run(self, epochs: int = 50):
         trainer = RLTrainer(
             run_config=RunConfig(
                 stop={"training_iteration": epochs},
                 callbacks=[
-                    WandbLoggerCallback(project="RLGymBoost", api_key="")
+                    WandbLoggerCallback(project="RLGymBoost", api_key=os.getenv("WANDB_API_KEY"))
                 ],
             ),
             scaling_config=ScalingConfig(num_workers=2, use_gpu=True),
