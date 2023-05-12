@@ -25,11 +25,13 @@ def main(cfg: Config):
 
     if cfg.tuner.run:
         tuner = Tuner(gym_name=cfg.gym_name, config=cfg.tuner)
-        tuner.run(cfg.algorithms)
+        tuner_results: dict = tuner.run(cfg.algorithms)
 
-    # if cfg.trainer.run:
-    #     trainer = Trainer()
-    #     trainer.run()
+    if cfg.trainer.run:
+        trainer = Trainer(
+            gym_name=cfg.gym_name, config=cfg.trainer, tuner_results=tuner_results
+        )
+        trainer_results: list[dict] = trainer.run()  # return top k algorithm results
 
 
 if __name__ == "__main__":

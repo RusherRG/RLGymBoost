@@ -35,5 +35,16 @@ trainer:
   run: true
   epochs: 100
 
+  #training
+  train_batch_size: 1000
+  num_gpus: 1
+
+  #rollouts
+  num_rollout_workers: 2
+  num_envs_per_worker: 1
+
+  #result
+  top_k_algos: 1
+
 algorithms:
   - ppo
