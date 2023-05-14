@@ -99,7 +99,7 @@ class Tuner:
                     stop=dict(self.config.stopping_criteria),
                     callbacks=[
                         WandbLoggerCallback(
-                            project="RLGymBoost", api_key=os.getenv("WANDB_API_KEY")
+                            project="RLGymBoost-Tuner", api_key=os.getenv("WANDB_API_KEY")
                         )
                     ],
                 ),

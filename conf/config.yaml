@@ -9,12 +9,24 @@ overwrite: False
 seed: 123
 output_dir: ./results
 
+# algorithms to be tuned
+algorithms:
+  - ddpg
+  - ppo
+  - dqn
+  - sac
+
+# ray configs
+use_cluster: false
+ray_cluster_address: auto
+ray_logging: false
+
 # tuner
 tuner:
-  run: false
+  run: true
 
   # PBT config
-  num_samples: 1
+  num_samples: 4
   time_attr: training_iteration
   perturbation_interval: 5
   resample_probability: 0.5
@@ -26,12 +38,12 @@ tuner:
   # resource config per worker
   num_cpus: 2
   num_gpus: 0.25
-  num_workers: 4
+  num_workers: 1
 
   # run config
   stopping_criteria:
     training_iteration: 20
-    episode_reward_mean: 20
+    episode_reward_mean: 100
 
 # trainer
 trainer:
@@ -52,13 +64,3 @@ trainer:
   #evaluation
   eval_interval: 10
   render_env: false
-
-algorithms:
-  - ddpg
-  - dqn
-  - ppo
-
-# ray configs
-use_cluster: false
-ray_cluster_address: auto
-ray_logging: false

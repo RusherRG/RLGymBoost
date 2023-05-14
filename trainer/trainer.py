@@ -24,7 +24,7 @@ class Trainer:
                 stop={"training_iteration": self.config.epochs},
                 callbacks=[
                     WandbLoggerCallback(
-                        project="RLGymBoost", api_key=os.getenv("WANDB_API_KEY")
+                        project="RLGymBoost-Trainer", api_key=os.getenv("WANDB_API_KEY")
                     )
                 ],
             ),
