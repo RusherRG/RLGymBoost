@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
+from typing import List
 
 from hydra.core.config_store import ConfigStore
-from typing import List
 
 from conf.mode import TrainerConfig, TunerConfig
 

@@ -1,8 +1,11 @@
-import colorlog
 import logging
-from omegaconf import OmegaConf, ValidationError
+import os
 from typing import List
 
+import colorlog
+from omegaconf import OmegaConf, ValidationError
+
+from conf import Config
 from conf.algorithms import AlgorithmConfig
 
 LOG_LEVEL = logging.DEBUG
@@ -32,3 +35,26 @@ def load_algo_config(algo_names: List[str], conf_path: str):
         conf = OmegaConf.load(f"{conf_path}/algorithms/{algo_name}.yaml")
         algo_configs.append(OmegaConf.merge(schema, conf))
     return algo_configs
+
+
+def save_results(cfg: Config, results: dict, filename: str, is_json: bool = True):
+    """
+    Save the results dictionary into a json file
+    """
+    with open(os.path.join(cfg.output_dir, cfg.exp_name, filename), "w") as f:
+        if is_json:
+            f.write(json.dumps(results))
+        else:
+            f.write(results)
+
+
+def get_results(cfg: Config, filename: str, is_json: bool = True):
+    """
+    Reads the results dictionary from a json file
+    """
+    with open(os.path.join(cfg.output_dir, cfg.exp_name, filename), "r") as f:
+        if is_json:
+            results = json.loads(f.read())
+        else:
+            results = f.read()
+    return results

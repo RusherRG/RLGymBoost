@@ -1,11 +1,11 @@
 import hydra
-from dotenv import load_dotenv
 import ray
+from dotenv import load_dotenv
 
 from conf import Config
 from trainer import Trainer
-from tuner import Tuner
-from utils import get_logger, load_algo_config
+from tuner import Tuner, filter_algorithms
+from utils import get_logger, get_results, load_algo_config, save_results
 from validator import validate_gym_environment
 
 logger = get_logger(__name__)
@@ -25,13 +25,17 @@ def main(cfg: Config):
 
     if cfg.tuner.run:
         tuner = Tuner(gym_name=cfg.gym_name, config=cfg.tuner)
+        cfg.algorithms = filter_algorithms(cfg)
         tuner_results: dict = tuner.run(cfg.algorithms)
+        save_results(cfg, tuner_results, "tuner_results.json")
 
     if cfg.trainer.run:
+        tuner_results = get_results(cfg, "tuner_results.json")
         trainer = Trainer(
             gym_name=cfg.gym_name, config=cfg.trainer, tuner_results=tuner_results
         )
         trainer_results: list[dict] = trainer.run()  # return top k algorithm results
+        save_results(cfg, trainer_results, "trainer_results.json")
 
 
 if __name__ == "__main__":

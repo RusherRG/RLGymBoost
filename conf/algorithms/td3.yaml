@@ -1,6 +1,6 @@
-name: PPO
+name: TD3
 
-discrete_actions: true
+discrete_actions: false
 continuous_actions: true
 multi_agent: true
 multi_gpu: true
@@ -8,6 +8,3 @@ multi_gpu: true
 hyperparameters:
   - lr
   - gamma
-  - kl_coeff
-  - lambda
-  - clip_param

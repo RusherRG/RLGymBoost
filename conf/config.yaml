@@ -1,10 +1,13 @@
 # gym
 gym_name: CartPole-v1
+has_discrete_actions: false
+multi_agent: false
 
 # run
 exp_name: gymnasium_car_racing
 overwrite: False
 seed: 123
+output_dir: ./results
 
 # tuner
 tuner:
@@ -47,4 +50,7 @@ trainer:
   top_k_algos: 1
 
 algorithms:
+  - a2c
+  - ddpg
+  - dqn
   - ppo

@@ -78,30 +78,30 @@ class Tuner:
             synch=True,
         )
 
-        tuner = tune.Tuner(
-            algo_config.name,
-            tune_config=tune.TuneConfig(
-                metric=self.config.metric,
-                mode=self.config.mode,
-                scheduler=pbt,
-                num_samples=self.config.num_samples,
-            ),
-            param_space={
-                "env": self.gym_name,
-                "num_workers": self.config.num_workers,
-                "num_gpus_per_worker": self.config.num_gpus,
-                "num_cpus_per_worker": self.config.num_cpus,
-            },
-            run_config=air.RunConfig(
-                stop=dict(self.config.stopping_criteria),
-                callbacks=[
-                    WandbLoggerCallback(
-                        project="RLGymBoost", api_key=os.getenv("WANDB_API_KEY")
-                    )
-                ],
-            ),
-        )
         try:
+            tuner = tune.Tuner(
+                algo_config.name,
+                tune_config=tune.TuneConfig(
+                    metric=self.config.metric,
+                    mode=self.config.mode,
+                    scheduler=pbt,
+                    num_samples=self.config.num_samples,
+                ),
+                param_space={
+                    "env": self.gym_name,
+                    "num_workers": self.config.num_workers,
+                    "num_gpus_per_worker": self.config.num_gpus,
+                    "num_cpus_per_worker": self.config.num_cpus,
+                },
+                run_config=air.RunConfig(
+                    stop=dict(self.config.stopping_criteria),
+                    callbacks=[
+                        WandbLoggerCallback(
+                            project="RLGymBoost", api_key=os.getenv("WANDB_API_KEY")
+                        )
+                    ],
+                ),
+            )
             results = tuner.fit()
             best_result = self.parse_results(results, algo_config)
             return best_result

@@ -1,11 +1,14 @@
-from ray.air.config import RunConfig, ScalingConfig
-from ray.train.rl import RLTrainer
-from ray.air.integrations.wandb import WandbLoggerCallback
-
-import pprint
 import os
+import pprint
+
+from ray.air.config import RunConfig, ScalingConfig
+from ray.air.integrations.wandb import WandbLoggerCallback
+from ray.train.rl import RLTrainer
 
 from conf.mode import TrainerConfig
+from utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class Trainer:
@@ -72,14 +75,14 @@ class Trainer:
         return metrics
 
     def save_checkpoint(self, epochs: int, trainer: RLTrainer):
-        checkpoint_dir = f"checkpoint/{self.gym_name}/"
+        checkpoint_dir = f"./checkpoints/{self.gym_name}/"
 
         os.makedirs(os.path.dirname(checkpoint_dir), exist_ok=True)
 
         saver = trainer.as_trainable()
         saver().save_checkpoint(checkpoint_dir=checkpoint_dir)
 
-        print(f"\nCheckpoint saved in directory {checkpoint_dir}")
+        logger.info(f"Checkpoint saved in directory {checkpoint_dir}")
 
     def update_best_results(self, result: dict):
         for i in range(min(len(self.best_results), self.config.top_k_algos)):

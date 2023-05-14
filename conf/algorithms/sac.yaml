@@ -1,4 +1,4 @@
-name: PPO
+name: SAC
 
 discrete_actions: true
 continuous_actions: true
@@ -8,6 +8,3 @@ multi_gpu: true
 hyperparameters:
   - lr
   - gamma
-  - kl_coeff
-  - lambda
-  - clip_param

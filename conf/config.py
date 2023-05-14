@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
+from typing import List
 
 from hydra.core.config_store import ConfigStore
-from typing import List
 
 from conf.algorithms import AlgorithmConfig
 from conf.mode import TrainerConfig, TunerConfig
@@ -13,7 +13,8 @@ class Config:
 
     # gym
     gym_name: str = ""
-    render_freq: int = 10  # frequency of environment render
+    has_discrete_actions: bool = False
+    multi_agent: bool = False
 
     # algorithms
     algorithms: List[AlgorithmConfig] = field(default_factory=list)
@@ -26,6 +27,7 @@ class Config:
     exp_name: str = ""
     overwrite: bool = False  # Overwrite the output directory if it exists
     seed: int = 42
+    output_dir: str = "./output" 
 
 
 cs = ConfigStore.instance()
