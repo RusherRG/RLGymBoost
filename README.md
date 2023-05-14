@@ -24,6 +24,24 @@ pip3 install -r requirements.txt
 
 ### Run tuner and trainer
 
+Add your WANDB_API_KEY to `.env`
 ```
 python boost.py
 ```
+
+## Results
+
+You can see the results in the RLGymBoost-Trainer and RLGymBoost-Tuner projects created in your wandb account.
+
+### Example results
+
+#### RLGymBoost-Tune
+![Dashboard](./assets/dash.png)
+#### All models rewards comparison
+![Dashboard](./assets/tune.png)
+#### PPO episode rewards
+![Dashboard](./assets/tune_ppo.png)
+#### RLGymBoost-Train
+![Dashboard](./assets/train.png)
+#### Best model - Episode rewards
+![Dashboard](./assets/train_reward.png)
