@@ -13,14 +13,16 @@ The goal of this project is to develop a tool that tunes and trains multiple rei
 - boost.py: main file to run the tuner and trainer algorithm for any gym environment.
 - utils.py: utility functions for logging, saving and fetching results, and loding algorithm configurations.
 
-## Installation
+## Commands
+
+### Installation
 
 ```
 sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
 pip3 install -r requirements.txt
 ```
 
-## Run tune and train command
+### Run tuner and trainer
 
 ```
 python boost.py
