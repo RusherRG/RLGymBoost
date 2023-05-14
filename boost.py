@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 
 from conf import Config
 from trainer import Trainer
-from tuner import Tuner, filter_algorithms
+from tuner import Tuner
+from tuner.utils import filter_algorithms
 from utils import get_logger, get_results, load_algo_config, save_results
 from validator import validate_gym_environment
 
@@ -21,7 +22,8 @@ def main(cfg: Config):
     if not validate_gym_environment(cfg.gym_name, cfg.seed):
         exit(0)
 
-    ray.init(address="auto", configure_logging=False)
+    if cfg.use_cluster:
+        ray.init(address=cfg.ray_cluster_address, configure_logging=cfg.ray_logging)
 
     if cfg.tuner.run:
         tuner = Tuner(gym_name=cfg.gym_name, config=cfg.tuner)

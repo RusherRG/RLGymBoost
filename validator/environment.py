@@ -1,4 +1,4 @@
-import gymnasium
+import gym
 
 from utils import get_logger
 
@@ -8,7 +8,7 @@ logger = get_logger(__name__)
 def validate_gym_environment(name: str, seed: int = 42) -> bool:
     logger.debug(f"Validating gym environment: {name}")
     try:
-        env = gymnasium.make(name)
+        env = gym.make(name)
         env.reset(seed=seed)
         logger.debug(f"action_space: {env.action_space}")
         logger.debug(f"observation_space: {env.observation_space}")

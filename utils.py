@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 from typing import List
 
 import colorlog
@@ -41,7 +42,10 @@ def save_results(cfg: Config, results: dict, filename: str, is_json: bool = True
     """
     Save the results dictionary into a json file
     """
-    with open(os.path.join(cfg.output_dir, cfg.exp_name, filename), "w") as f:
+    results_path = os.path.join(cfg.output_dir, cfg.exp_name)
+    if not os.path.exists(results_path):
+        os.makedirs(results_path)
+    with open(os.path.join(results_path, filename), "w") as f:
         if is_json:
             f.write(json.dumps(results))
         else:

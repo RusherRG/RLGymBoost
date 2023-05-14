@@ -43,8 +43,7 @@ class Trainer:
                 # training
                 "model": {"fcnet_hiddens": [64, 64]},
                 "train_batch_size": self.config.train_batch_size,
-                "lr": self.tuner_results[algo_name]["hyperparameters"]["lr"],
-                "gamma": self.tuner_results[algo_name]["hyperparameters"]["gamma"],
+                **self.tuner_results[algo_name]["hyperparameters"],
             },
         )
         result = trainer.fit()

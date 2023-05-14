@@ -26,10 +26,11 @@ class Tuner:
         """
         all_mutations = {
             "lambda": tune.quniform(0.9, 1.0, 0.01),
-            "clip_param": tune.quniform(0.05, 0.5, 0.05),
-            "lr": tune.quniform(5e-3, 1e-1, 5e-3),
+            "clip_param": tune.quniform(0.05, 0.3, 0.05),
+            "lr": tune.choice([5e-4, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2]),
             "kl_coeff": tune.quniform(0.3, 1, 0.1),
             "gamma": tune.quniform(0.95, 0.99, 0.01),
+            "grad_clip": tune.quniform(10, 40, 10),
         }
 
         mutations = {}
@@ -92,6 +93,7 @@ class Tuner:
                     "num_workers": self.config.num_workers,
                     "num_gpus_per_worker": self.config.num_gpus,
                     "num_cpus_per_worker": self.config.num_cpus,
+
                 },
                 run_config=air.RunConfig(
                     stop=dict(self.config.stopping_criteria),

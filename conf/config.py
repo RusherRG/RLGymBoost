@@ -29,6 +29,11 @@ class Config:
     seed: int = 42
     output_dir: str = "./output" 
 
+    # ray config
+    use_cluster: bool = False
+    ray_cluster_address: str = "auto"
+    ray_logging: bool = False
+
 
 cs = ConfigStore.instance()
 cs.store(name="base_config", node=Config)
