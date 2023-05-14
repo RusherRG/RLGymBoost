@@ -11,10 +11,10 @@ output_dir: ./results
 
 # tuner
 tuner:
-  run: true
+  run: false
 
   # PBT config
-  num_samples: 4
+  num_samples: 1
   time_attr: training_iteration
   perturbation_interval: 5
   resample_probability: 0.5
@@ -31,7 +31,7 @@ tuner:
   # run config
   stopping_criteria:
     training_iteration: 20
-    episode_reward_mean: 100
+    episode_reward_mean: 20
 
 # trainer
 trainer:
@@ -48,6 +48,10 @@ trainer:
 
   #result
   top_k_algos: 1
+
+  #evaluation
+  eval_interval: 10
+  render_env: false
 
 algorithms:
   - ddpg

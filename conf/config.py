@@ -27,7 +27,7 @@ class Config:
     exp_name: str = ""
     overwrite: bool = False  # Overwrite the output directory if it exists
     seed: int = 42
-    output_dir: str = "./output" 
+    output_dir: str = "./output"
 
     # ray config
     use_cluster: bool = False

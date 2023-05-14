@@ -43,6 +43,8 @@ class Trainer:
                 # training
                 "model": {"fcnet_hiddens": [64, 64]},
                 "train_batch_size": self.config.train_batch_size,
+                "evaluation_interval": self.config.eval_interval,
+                "evaluation_config": {"render_env": self.config.render_env},
                 **self.tuner_results[algo_name]["hyperparameters"],
             },
         )

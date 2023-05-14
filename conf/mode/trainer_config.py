@@ -12,3 +12,5 @@ class TrainerConfig:
     num_gpus: int = 1
     train_batch_size: int = 1000
     top_k_algos: int = 1  # k value for top k algorithm results
+    eval_intervaleval_interval: int = 10
+    render_env: bool = False
